@@ -1,6 +1,7 @@
 import { useState } from "react";
 import Icon from "@/components/ui/icon";
 import WorkOrderForm, { type WorkOrderFormData } from "@/components/WorkOrderForm";
+import WorkOrderPreview from "@/components/WorkOrderPreview";
 
 type Role = "executor" | "approver" | "authorizer" | "analyst";
 
@@ -45,6 +46,7 @@ export default function JournalPage({ role }: { role: Role }) {
   const [showForm, setShowForm] = useState(false);
   const [orders, setOrders] = useState<WorkOrder[]>(ORDERS);
   const [editingOrder, setEditingOrder] = useState<{ id: string; data: WorkOrderFormData } | null>(null);
+  const [previewData, setPreviewData] = useState<WorkOrderFormData | null>(null);
 
   const nextNumber = `НД-2026-${String(orders.length + 143).padStart(4, "0")}`;
 
@@ -262,6 +264,7 @@ export default function JournalPage({ role }: { role: Role }) {
             };
             setOrders((prev) => [newOrder, ...prev]);
             setShowForm(false);
+            setPreviewData(data);
           }}
         />
       )}
@@ -287,6 +290,18 @@ export default function JournalPage({ role }: { role: Role }) {
               )
             );
             setEditingOrder(null);
+            setPreviewData(data);
+          }}
+        />
+      )}
+
+      {previewData && (
+        <WorkOrderPreview
+          data={previewData}
+          onClose={() => setPreviewData(null)}
+          onEdit={() => {
+            setEditingOrder({ id: "", data: previewData });
+            setPreviewData(null);
           }}
         />
       )}
