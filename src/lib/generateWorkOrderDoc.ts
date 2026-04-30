@@ -495,6 +495,174 @@ export async function generateWorkOrderDoc(data: WorkOrderFormData) {
     hintPara("(Фамилия И.О., должность, подпись допускающего лица, дата, время)")
   );
 
+  // ─── ПРИЛОЖЕНИЯ ───
+  children.push(
+    new Paragraph({ children: [], pageBreakBefore: true }),
+    new Paragraph({
+      children: [txt("ПРИЛОЖЕНИЯ К НАРЯДУ-ДОПУСКУ № " + (data.orderNumber || "___"), { bold: true, size: SZ_TITLE })],
+      alignment: AlignmentType.CENTER,
+      spacing: { before: 0, after: 200 },
+    })
+  );
+
+  // Приложение 1 — Мероприятия по обеспечению безопасности
+  children.push(
+    new Paragraph({
+      children: [txt("Приложение № 1", { bold: true, size: SZ })],
+      alignment: AlignmentType.CENTER,
+      spacing: { after: 60 },
+    }),
+    new Paragraph({
+      children: [txt("Меры по обеспечению безопасного проведения работ", { bold: true, size: SZ })],
+      alignment: AlignmentType.CENTER,
+      spacing: { after: 120 },
+    }),
+    new Paragraph({
+      children: [txt("6.1. Мероприятия по подготовке объекта к проведению работ и последовательности их проведения:", { bold: true })],
+      spacing: { after: 80 },
+    }),
+    new Paragraph({ children: [txt(data.preparationMeasures || "_".repeat(80))], spacing: { after: 160 } }),
+
+    new Paragraph({
+      children: [txt("6.2. Средства индивидуальной защиты и режим работы:", { bold: true })],
+      spacing: { after: 80 },
+    }),
+    ...Array.from({ length: 6 }, () =>
+      new Paragraph({
+        children: [txt("_".repeat(100))],
+        spacing: { after: 80 },
+      })
+    ),
+
+    new Paragraph({
+      children: [txt("Требуемые приложения:", { bold: true })],
+      spacing: { before: 120, after: 80 },
+    }),
+    new Paragraph({
+      children: [txt(
+        "Приложение №1 Меры по обеспечению безопасности. " +
+        "Приложение №2 Таблица анализ воздушной среды на месте проведения работ. " +
+        "Приложение №3 Схема проведения анализа ГВС на месте проведения работ. " +
+        "Приложение №4 Схема расстановки оборудования на месте производства работ. " +
+        "Приложение №5 Технологическая схема отключённого участка.",
+        { italic: true }
+      )],
+      spacing: { after: 200 },
+    })
+  );
+
+  // Приложение 2 — Таблица анализа воздушной среды
+  children.push(
+    new Paragraph({
+      children: [txt("Приложение № 2", { bold: true, size: SZ })],
+      alignment: AlignmentType.CENTER,
+      spacing: { before: 200, after: 60 },
+    }),
+    new Paragraph({
+      children: [txt("Таблица анализа воздушной среды на месте проведения работ", { bold: true, size: SZ })],
+      alignment: AlignmentType.CENTER,
+      spacing: { after: 120 },
+    }),
+    new Table({
+      width: { size: 100, type: WidthType.PERCENTAGE },
+      rows: [
+        new TableRow({
+          children: [
+            tableCell("№ п/п", { bold: true, center: true, shade: true, width: 400 }),
+            tableCell("Дата и время отбора проб", { bold: true, center: true, shade: true, width: 1400 }),
+            tableCell("Место отбора проб", { bold: true, center: true, shade: true, width: 1600 }),
+            tableCell("Определяемые компоненты", { bold: true, center: true, shade: true, width: 1600 }),
+            tableCell("Допустимая конц., мг/м³ (% для кислорода)", { bold: true, center: true, shade: true, width: 1400 }),
+            tableCell("Результаты анализа, мг/м³ (% для кислорода)", { bold: true, center: true, shade: true, width: 1400 }),
+            tableCell("Подпись лица, проводившего анализ", { bold: true, center: true, shade: true, width: 1300 }),
+            tableCell("Подпись ответственного за проведение работ", { bold: true, center: true, shade: true, width: 1400 }),
+          ],
+          tableHeader: true,
+        }),
+        ...data.gasAnalysis.map((g, i) =>
+          new TableRow({
+            children: [
+              tableCell(String(i + 1), { center: true }),
+              tableCell(g.datetime ? formatDateTime(g.datetime) : ""),
+              tableCell(g.location),
+              tableCell(g.components),
+              tableCell(g.allowedConc),
+              tableCell(g.result),
+              tableCell(""),
+              tableCell(""),
+            ],
+          })
+        ),
+        // Пустые строки для заполнения
+        ...Array.from({ length: 5 }, (_, i) =>
+          new TableRow({
+            children: [
+              tableCell(String(data.gasAnalysis.length + i + 1), { center: true }),
+              tableCell(""), tableCell(""), tableCell(""), tableCell(""), tableCell(""), tableCell(""), tableCell(""),
+            ],
+          })
+        ),
+      ],
+    })
+  );
+
+  // Приложение 3 — Схема анализа ГВС
+  children.push(
+    new Paragraph({
+      children: [txt("Приложение № 3", { bold: true, size: SZ })],
+      alignment: AlignmentType.CENTER,
+      spacing: { before: 200, after: 60 },
+    }),
+    new Paragraph({
+      children: [txt("Схема проведения анализа ГВС на месте проведения работ", { bold: true, size: SZ })],
+      alignment: AlignmentType.CENTER,
+      spacing: { after: 120 },
+    }),
+    new Paragraph({
+      children: [txt(data.schemes || "Схема прилагается.", { italic: !data.schemes })],
+      spacing: { after: 80 },
+    }),
+    ...Array.from({ length: 12 }, () =>
+      new Paragraph({ children: [txt("_".repeat(100))], spacing: { after: 80 } })
+    )
+  );
+
+  // Приложение 4 — Схема расстановки оборудования
+  children.push(
+    new Paragraph({
+      children: [txt("Приложение № 4", { bold: true, size: SZ })],
+      alignment: AlignmentType.CENTER,
+      spacing: { before: 200, after: 60 },
+    }),
+    new Paragraph({
+      children: [txt("Схема расстановки оборудования на месте производства работ", { bold: true, size: SZ })],
+      alignment: AlignmentType.CENTER,
+      spacing: { after: 120 },
+    }),
+    hintPara("(указываются оси установки, оборудования, трубопроводов с указанием расстояний до границ опасных зон, схемы промывки, продувки, точки отбора проб воздушной среды, установки заглушек, создания разъёмов фланцевых соединений и т.д.)"),
+    ...Array.from({ length: 14 }, () =>
+      new Paragraph({ children: [txt("_".repeat(100))], spacing: { after: 80 } })
+    )
+  );
+
+  // Приложение 5 — Технологическая схема
+  children.push(
+    new Paragraph({
+      children: [txt("Приложение № 5", { bold: true, size: SZ })],
+      alignment: AlignmentType.CENTER,
+      spacing: { before: 200, after: 60 },
+    }),
+    new Paragraph({
+      children: [txt("Технологическая схема отключённого участка", { bold: true, size: SZ })],
+      alignment: AlignmentType.CENTER,
+      spacing: { after: 120 },
+    }),
+    hintPara("(указываются оси установки, оборудования, трубопроводов с указанием расстояний до границ опасных зон, схемы промывки, продувки, точки отбора проб воздушной среды и т.д.)"),
+    ...Array.from({ length: 14 }, () =>
+      new Paragraph({ children: [txt("_".repeat(100))], spacing: { after: 80 } })
+    )
+  );
+
   // ─── Генерация документа ───
   const doc = new Document({
     sections: [

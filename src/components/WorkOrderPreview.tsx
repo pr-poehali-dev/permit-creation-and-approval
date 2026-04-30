@@ -466,6 +466,107 @@ export default function WorkOrderPreview({ data, onClose, onEdit }: Props) {
               <div><span style={{ borderBottom: "1px solid #000", display: "inline-block", minWidth: 240 }}>{data.closedBy}</span> &nbsp; {fmt(data.closedDate)}</div>
               <div style={{ fontSize: 9, color: "#555", fontStyle: "italic", textAlign: "center" }}>(Фамилия И.О., должность, подпись допускающего лица, дата, время)</div>
             </div>
+
+            {/* ─── ПРИЛОЖЕНИЯ ─── */}
+            <div style={{ borderTop: "2px solid #000", marginTop: 24, paddingTop: 16 }}>
+              <div style={{ fontWeight: "bold", fontSize: 14, textAlign: "center", marginBottom: 16 }}>
+                ПРИЛОЖЕНИЯ К НАРЯДУ-ДОПУСКУ № {data.orderNumber}
+              </div>
+
+              {/* Приложение 1 */}
+              <div style={{ marginBottom: 20, padding: "12px 0", borderBottom: "1px solid #ddd" }}>
+                <div style={{ fontWeight: "bold", fontSize: 12, textAlign: "center", marginBottom: 6 }}>Приложение № 1</div>
+                <div style={{ fontWeight: "bold", textAlign: "center", marginBottom: 10 }}>Меры по обеспечению безопасного проведения работ</div>
+                <div style={{ marginBottom: 6 }}><b>6.1. Мероприятия по подготовке объекта:</b></div>
+                <div style={{ borderBottom: "1px solid #000", minHeight: 20, marginBottom: 8 }}>{data.preparationMeasures}</div>
+                <div style={{ marginBottom: 6 }}><b>6.2. Средства индивидуальной защиты и режим работы:</b></div>
+                {Array.from({ length: 4 }, (_, i) => (
+                  <div key={i} style={{ borderBottom: "1px solid #ccc", minHeight: 18, marginBottom: 6 }}></div>
+                ))}
+                <div style={{ marginTop: 10 }}>
+                  <b>Требуемые приложения:</b>
+                  <div style={{ fontSize: 10, fontStyle: "italic", marginTop: 4 }}>
+                    Приложение №1 Меры по обеспечению безопасности. Приложение №2 Таблица анализ воздушной среды на месте проведения работ. Приложение №3 Схема проведения анализа ГВС на месте проведения работ. Приложение №4 Схема расстановки оборудования на месте производства работ. Приложение №5 Технологическая схема отключённого участка.
+                  </div>
+                </div>
+              </div>
+
+              {/* Приложение 2 */}
+              <div style={{ marginBottom: 20, padding: "12px 0", borderBottom: "1px solid #ddd" }}>
+                <div style={{ fontWeight: "bold", fontSize: 12, textAlign: "center", marginBottom: 6 }}>Приложение № 2</div>
+                <div style={{ fontWeight: "bold", textAlign: "center", marginBottom: 10 }}>Таблица анализа воздушной среды на месте проведения работ</div>
+                <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 10 }}>
+                  <thead>
+                    <tr style={{ background: "#f0f0f0" }}>
+                      <th style={{ border: "1px solid #000", padding: "2px 3px", textAlign: "center" }}>№</th>
+                      <th style={{ border: "1px solid #000", padding: "2px 3px" }}>Дата и время отбора</th>
+                      <th style={{ border: "1px solid #000", padding: "2px 3px" }}>Место отбора проб</th>
+                      <th style={{ border: "1px solid #000", padding: "2px 3px" }}>Определяемые компоненты</th>
+                      <th style={{ border: "1px solid #000", padding: "2px 3px" }}>Допустимая конц., мг/м³</th>
+                      <th style={{ border: "1px solid #000", padding: "2px 3px" }}>Результаты анализа, мг/м³</th>
+                      <th style={{ border: "1px solid #000", padding: "2px 3px" }}>Подпись проводившего</th>
+                      <th style={{ border: "1px solid #000", padding: "2px 3px" }}>Подпись отв. за работы</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {data.gasAnalysis.map((g, i) => (
+                      <tr key={g.id}>
+                        <td style={{ border: "1px solid #000", padding: "2px 3px", textAlign: "center" }}>{i + 1}</td>
+                        <td style={{ border: "1px solid #000", padding: "2px 3px" }}>{g.datetime ? fmt(g.datetime) : ""}</td>
+                        <td style={{ border: "1px solid #000", padding: "2px 3px" }}>{g.location}</td>
+                        <td style={{ border: "1px solid #000", padding: "2px 3px" }}>{g.components}</td>
+                        <td style={{ border: "1px solid #000", padding: "2px 3px", textAlign: "center" }}>{g.allowedConc}</td>
+                        <td style={{ border: "1px solid #000", padding: "2px 3px", textAlign: "center" }}>{g.result}</td>
+                        <td style={{ border: "1px solid #000", padding: "2px 3px" }}></td>
+                        <td style={{ border: "1px solid #000", padding: "2px 3px" }}></td>
+                      </tr>
+                    ))}
+                    {Array.from({ length: 5 }, (_, i) => (
+                      <tr key={`empty-${i}`}>
+                        <td style={{ border: "1px solid #000", padding: "2px 3px", textAlign: "center" }}>{data.gasAnalysis.length + i + 1}</td>
+                        <td style={{ border: "1px solid #000", padding: "12px 3px" }}></td>
+                        <td style={{ border: "1px solid #000", padding: "12px 3px" }}></td>
+                        <td style={{ border: "1px solid #000", padding: "12px 3px" }}></td>
+                        <td style={{ border: "1px solid #000", padding: "12px 3px" }}></td>
+                        <td style={{ border: "1px solid #000", padding: "12px 3px" }}></td>
+                        <td style={{ border: "1px solid #000", padding: "12px 3px" }}></td>
+                        <td style={{ border: "1px solid #000", padding: "12px 3px" }}></td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Приложение 3 */}
+              <div style={{ marginBottom: 20, padding: "12px 0", borderBottom: "1px solid #ddd" }}>
+                <div style={{ fontWeight: "bold", fontSize: 12, textAlign: "center", marginBottom: 6 }}>Приложение № 3</div>
+                <div style={{ fontWeight: "bold", textAlign: "center", marginBottom: 10 }}>Схема проведения анализа ГВС на месте проведения работ</div>
+                <div style={{ marginBottom: 6, fontSize: 10, fontStyle: "italic", textAlign: "center" }}>(указываются оси установки, оборудования, трубопроводов, точки отбора проб воздушной среды)</div>
+                <div style={{ border: "1px dashed #aaa", minHeight: 200, padding: 8, color: "#aaa", textAlign: "center", lineHeight: "200px", fontSize: 12 }}>
+                  {data.schemes || "Место для схемы"}
+                </div>
+              </div>
+
+              {/* Приложение 4 */}
+              <div style={{ marginBottom: 20, padding: "12px 0", borderBottom: "1px solid #ddd" }}>
+                <div style={{ fontWeight: "bold", fontSize: 12, textAlign: "center", marginBottom: 6 }}>Приложение № 4</div>
+                <div style={{ fontWeight: "bold", textAlign: "center", marginBottom: 10 }}>Схема расстановки оборудования на месте производства работ</div>
+                <div style={{ marginBottom: 6, fontSize: 10, fontStyle: "italic", textAlign: "center" }}>(указываются оси установки, оборудования, трубопроводов с указанием расстояний до границ опасных зон, схемы промывки, продувки, установки заглушек, создания разъёмов фланцевых соединений и т.д.)</div>
+                <div style={{ border: "1px dashed #aaa", minHeight: 200, padding: 8, color: "#aaa", textAlign: "center", lineHeight: "200px", fontSize: 12 }}>
+                  Место для схемы
+                </div>
+              </div>
+
+              {/* Приложение 5 */}
+              <div style={{ marginBottom: 8, padding: "12px 0" }}>
+                <div style={{ fontWeight: "bold", fontSize: 12, textAlign: "center", marginBottom: 6 }}>Приложение № 5</div>
+                <div style={{ fontWeight: "bold", textAlign: "center", marginBottom: 10 }}>Технологическая схема отключённого участка</div>
+                <div style={{ marginBottom: 6, fontSize: 10, fontStyle: "italic", textAlign: "center" }}>(указываются оси установки, оборудования, трубопроводов с указанием расстояний до границ опасных зон, точки отбора проб воздушной среды и т.д.)</div>
+                <div style={{ border: "1px dashed #aaa", minHeight: 200, padding: 8, color: "#aaa", textAlign: "center", lineHeight: "200px", fontSize: 12 }}>
+                  Место для схемы
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
