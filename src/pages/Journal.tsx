@@ -1,5 +1,6 @@
 import { useState } from "react";
 import Icon from "@/components/ui/icon";
+import WorkOrderForm from "@/components/WorkOrderForm";
 
 type Role = "executor" | "approver" | "authorizer" | "analyst";
 
@@ -41,8 +42,12 @@ const RISK_MAP = {
 export default function JournalPage({ role }: { role: Role }) {
   const [search, setSearch] = useState("");
   const [filterStatus, setFilterStatus] = useState("all");
+  const [showForm, setShowForm] = useState(false);
+  const [orders, setOrders] = useState<WorkOrder[]>(ORDERS);
 
-  const filtered = ORDERS.filter((o) => {
+  const nextNumber = `НД-2026-${String(orders.length + 143).padStart(4, "0")}`;
+
+  const filtered = orders.filter((o) => {
     const matchSearch =
       o.number.toLowerCase().includes(search.toLowerCase()) ||
       o.title.toLowerCase().includes(search.toLowerCase()) ||
@@ -100,6 +105,7 @@ export default function JournalPage({ role }: { role: Role }) {
         </select>
         {(role === "authorizer" || role === "approver") && (
           <button
+            onClick={() => setShowForm(true)}
             className="flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium text-white transition-colors"
             style={{ background: "hsl(var(--primary))" }}
           >
@@ -169,7 +175,7 @@ export default function JournalPage({ role }: { role: Role }) {
         )}
         <div className="px-4 py-3 border-t flex items-center justify-between" style={{ borderColor: "hsl(var(--border))" }}>
           <p className="text-xs" style={{ color: "hsl(var(--muted-foreground))" }}>
-            Показано {filtered.length} из {ORDERS.length}
+            Показано {filtered.length} из {orders.length}
           </p>
           <div className="flex items-center gap-1">
             <button className="p-1 rounded hover:bg-muted transition-colors">
@@ -182,6 +188,29 @@ export default function JournalPage({ role }: { role: Role }) {
           </div>
         </div>
       </div>
+
+      {showForm && (
+        <WorkOrderForm
+          nextNumber={nextNumber}
+          onClose={() => setShowForm(false)}
+          onSave={(data) => {
+            const newOrder: WorkOrder = {
+              id: String(Date.now()),
+              number: data.orderNumber || nextNumber,
+              title: data.workDescription || "Новый наряд",
+              object: data.workLocation || "—",
+              responsible: data.issuedByPerson || "—",
+              executor: data.brigade[0]?.name || "—",
+              dateStart: data.planStart ? data.planStart.slice(0, 10).split("-").reverse().join(".") : "—",
+              dateEnd: data.planEnd ? data.planEnd.slice(0, 10).split("-").reverse().join(".") : "—",
+              status: "pending",
+              risk: "medium",
+            };
+            setOrders((prev) => [newOrder, ...prev]);
+            setShowForm(false);
+          }}
+        />
+      )}
     </div>
   );
 }
