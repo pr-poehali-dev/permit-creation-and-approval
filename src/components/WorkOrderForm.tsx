@@ -207,7 +207,11 @@ interface Props {
   onClose: () => void;
   onSave: (data: WorkOrderFormData) => void;
   nextNumber?: string;
+  initialData?: WorkOrderFormData;
+  editId?: string;
 }
+
+export type { WorkOrderFormData };
 
 const Field = ({
   label,
@@ -241,11 +245,10 @@ const SectionTitle = ({ num, children }: { num?: string | number; children: Reac
   </div>
 );
 
-export default function WorkOrderForm({ onClose, onSave, nextNumber = "" }: Props) {
-  const [form, setForm] = useState<WorkOrderFormData>(() => ({
-    ...emptyForm(),
-    orderNumber: nextNumber,
-  }));
+export default function WorkOrderForm({ onClose, onSave, nextNumber = "", initialData, editId }: Props) {
+  const [form, setForm] = useState<WorkOrderFormData>(() =>
+    initialData ? { ...initialData } : { ...emptyForm(), orderNumber: nextNumber }
+  );
   const [activeTab, setActiveTab] = useState(0);
 
   const set = (key: keyof WorkOrderFormData, value: unknown) =>
@@ -318,7 +321,7 @@ export default function WorkOrderForm({ onClose, onSave, nextNumber = "" }: Prop
             </div>
             <div>
               <h2 className="text-white font-semibold text-base">
-                Наряд-допуск № {form.orderNumber || "—"}
+                {editId ? "Редактирование наряда-допуска" : "Новый наряд-допуск"} № {form.orderNumber || "—"}
               </h2>
               <p className="text-white/70 text-xs">на проведение газоопасных, огневых работ и работ повышенной опасности</p>
             </div>

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import Icon from "@/components/ui/icon";
-import WorkOrderForm from "@/components/WorkOrderForm";
+import WorkOrderForm, { type WorkOrderFormData } from "@/components/WorkOrderForm";
 
 type Role = "executor" | "approver" | "authorizer" | "analyst";
 
@@ -44,8 +44,58 @@ export default function JournalPage({ role }: { role: Role }) {
   const [filterStatus, setFilterStatus] = useState("all");
   const [showForm, setShowForm] = useState(false);
   const [orders, setOrders] = useState<WorkOrder[]>(ORDERS);
+  const [editingOrder, setEditingOrder] = useState<{ id: string; data: WorkOrderFormData } | null>(null);
 
   const nextNumber = `НД-2026-${String(orders.length + 143).padStart(4, "0")}`;
+
+  const openEdit = (order: WorkOrder) => {
+    const data: WorkOrderFormData = {
+      ost: "АО «Транснефть-Сибирь»",
+      branch: "Нижневартовское УМН",
+      subdivision: "НПС «Раскино»",
+      chiefEngineer: "С.А. Подковырин",
+      approveDate: "",
+      orderNumber: order.number,
+      workType: "gas",
+      issuedTo: order.responsible,
+      workDescription: order.title,
+      hazards: "",
+      workLocation: order.object,
+      brigade: [{ id: "1", name: order.executor, profession: "", function: "Исполнитель", signDate: order.dateStart }],
+      planStart: "",
+      planEnd: "",
+      preparationMeasures: "См. приложение № 1",
+      schemes: "",
+      specialConditions: "",
+      issuedByPerson: order.responsible,
+      issuedByDate: "",
+      agreementOT: "", agreementOTDate: "",
+      agreementFire: "", agreementFireDate: "",
+      agreementPASF: "", agreementPASFDate: "",
+      agreementUESAiTM: "", agreementUESAiTMDate: "",
+      agreementUOZO: "", agreementUOZODate: "",
+      agreementOperator: "", agreementOperatorDate: "",
+      gasAnalysis: [{ id: "1", datetime: "", location: "", components: "", allowedConc: "", result: "" }],
+      prepDoneBy: "", prepDoneDate: "",
+      prepDoneBy2: "", prepDoneDate2: "",
+      admittedBy: "", admittedDate: "",
+      dailyAccess: [
+        { id: "1", date: "", startTime: "", endTime: "" },
+        { id: "2", date: "", startTime: "", endTime: "" },
+        { id: "3", date: "", startTime: "", endTime: "" },
+        { id: "4", date: "", startTime: "", endTime: "" },
+      ],
+      extendedTo: "", extendedByPerson: "",
+      removedMembers: [{ id: "1", name: "", dateTime: "", profession: "" }],
+      addedMembers: [{ id: "1", name: "", dateTime: "", profession: "", function: "" }],
+      suspendedDate: "", suspendedBy: "", suspendReason: "",
+      resumedBy: "",
+      workCompletedBy: "", workCompletedDate: "",
+      operatorName: "", operatorDate: "",
+      closedBy: "", closedDate: "",
+    };
+    setEditingOrder({ id: order.id, data });
+  };
 
   const filtered = orders.filter((o) => {
     const matchSearch =
@@ -158,7 +208,11 @@ export default function JournalPage({ role }: { role: Role }) {
                     </span>
                   </td>
                   <td className="px-4 py-3">
-                    <button className="p-1 rounded hover:bg-muted transition-colors">
+                    <button
+                      onClick={() => openEdit(order)}
+                      className="p-1 rounded hover:bg-muted transition-colors"
+                      title="Открыть наряд"
+                    >
                       <Icon name="ChevronRight" size={14} style={{ color: "hsl(var(--muted-foreground))" }} />
                     </button>
                   </td>
@@ -208,6 +262,31 @@ export default function JournalPage({ role }: { role: Role }) {
             };
             setOrders((prev) => [newOrder, ...prev]);
             setShowForm(false);
+          }}
+        />
+      )}
+
+      {editingOrder && (
+        <WorkOrderForm
+          editId={editingOrder.id}
+          initialData={editingOrder.data}
+          onClose={() => setEditingOrder(null)}
+          onSave={(data) => {
+            setOrders((prev) =>
+              prev.map((o) =>
+                o.id === editingOrder.id
+                  ? {
+                      ...o,
+                      number: data.orderNumber || o.number,
+                      title: data.workDescription || o.title,
+                      object: data.workLocation || o.object,
+                      responsible: data.issuedByPerson || o.responsible,
+                      executor: data.brigade[0]?.name || o.executor,
+                    }
+                  : o
+              )
+            );
+            setEditingOrder(null);
           }}
         />
       )}
